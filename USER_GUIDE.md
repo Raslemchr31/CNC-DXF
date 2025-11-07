@@ -465,6 +465,17 @@ You can modify DXF files before cutting:
 - **Solution**: Reduce image resolution slightly
 - **Solution**: Simplify image manually first
 
+**Problem**: Empty DXF file (no entities) - CRITICAL
+- **Cause**: Image is too light/bright for the threshold used
+- **Example**: Light brown pattern on white with 50% threshold
+- **How to identify**: Check conversion history - file size will be very small (< 1KB)
+- **Solution**: INCREASE threshold to 65-80%
+- **Why**: Threshold logic is inverted:
+  - Pixels DARKER than threshold → get cut
+  - Pixels LIGHTER than threshold → don't get cut
+  - Light images need HIGH threshold to capture the pattern
+- **Test**: Try 70% first, then adjust up or down by 5%
+
 ---
 
 ## Advanced Usage
