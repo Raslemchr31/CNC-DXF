@@ -78,7 +78,11 @@ class DXFConverter:
             if not dxf_path.exists():
                 raise Exception("Failed to create DXF file")
 
-            # Step 3: Verify DXF and extract metadata
+            # Step 3: Convert POLYLINES to LINEs for CNC compatibility
+            print("Converting POLYLINES to LINEs...")
+            self.convert_polylines_to_lines(str(dxf_path))
+
+            # Step 4: Verify DXF and extract metadata
             print("Analyzing DXF file...")
             metadata = self.analyze_dxf(str(dxf_path))
 
@@ -86,7 +90,7 @@ class DXFConverter:
             if metadata.get("has_splines", False):
                 raise Exception("DXF contains SPLINES! CNC incompatible. This should not happen with Potrace.")
 
-            # Step 4: Generate thumbnail from original image
+            # Step 5: Generate thumbnail from original image
             print("Generating thumbnail...")
             self.generate_thumbnail(image_path, str(thumbnail_path))
 
@@ -109,6 +113,48 @@ class DXFConverter:
                 if path.exists():
                     path.unlink()
             raise
+
+    def convert_polylines_to_lines(self, dxf_path: str):
+        """
+        Convert all POLYLINE entities to individual LINE entities
+
+        This is critical for CNC machines that require LINE entities
+        instead of POLYLINES. Each polyline is "exploded" into
+        individual line segments.
+
+        Args:
+            dxf_path: Path to DXF file to convert (will be modified in-place)
+        """
+        # Read the original DXF
+        doc = ezdxf.readfile(dxf_path)
+        msp = doc.modelspace()
+
+        # Get all current entities
+        entities_to_convert = []
+        for entity in msp:
+            if entity.dxftype() == 'POLYLINE':
+                entities_to_convert.append(entity)
+
+        # Convert each POLYLINE to LINEs
+        for polyline in entities_to_convert:
+            # Get all vertices from the polyline
+            points = list(polyline.points())
+
+            # Create LINE for each segment
+            for i in range(len(points) - 1):
+                start = points[i]
+                end = points[i + 1]
+                msp.add_line(start, end)
+
+            # If polyline is closed, connect last point to first
+            if polyline.is_closed and len(points) > 2:
+                msp.add_line(points[-1], points[0])
+
+            # Remove the original polyline
+            msp.delete_entity(polyline)
+
+        # Save the modified DXF back to the same file
+        doc.saveas(dxf_path)
 
     def analyze_dxf(self, dxf_path: str) -> dict:
         """

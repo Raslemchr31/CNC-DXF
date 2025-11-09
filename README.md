@@ -4,13 +4,13 @@ Professional web-based tool for converting images to DXF files for CNC plasma cu
 
 ## Overview
 
-This application converts bitmap images (JPG, PNG, BMP) into DXF vector files containing POLYLINE entities suitable for CNC plasma cutters. The system uses **Potrace** for vectorization and provides a modern web interface for managing conversions.
+This application converts bitmap images (JPG, PNG, BMP) into DXF vector files containing LINE entities suitable for CNC plasma cutters. The system uses **Potrace** for vectorization and provides a modern web interface for managing conversions.
 
 ## Key Features
 
 - **Image to DXF Conversion**: Convert raster images to vector DXF files
 - **Adjustable Threshold**: Control edge detection sensitivity (0-100%)
-- **CNC-Compatible Output**: Generates POLYLINE entities (not SPLINES) for CNC compatibility
+- **CNC-Compatible Output**: Generates LINE entities (not SPLINES) for CNC compatibility
 - **Conversion History**: Track and manage all conversions
 - **Thumbnail Previews**: Visual preview of converted images
 - **Download Management**: Easy DXF file downloads
@@ -68,7 +68,7 @@ This application converts bitmap images (JPG, PNG, BMP) into DXF vector files co
    - Save as PBM format
 3. **Vectorization**:
    - Potrace traces bitmap to vector paths
-   - Output DXF with POLYLINE entities
+   - Output DXF generating POLYLINES, then convert to LINEs
 4. **Analysis**:
    - ezdxf analyzes DXF structure
    - Verifies entity types (no SPLINES)
